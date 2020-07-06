@@ -1,0 +1,8 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../css/css.css" rel="stylesheet" type="text/css" />
+<div id="left">
+      <p><a href="../person/task.jsp" target="_self" >计划管理</a></p>
+      <p><a href="../person/checkpro.jsp" target="_self">查询计划</a></p>
+      <p><a href="../person/task.jsp" target="_self">我的任务</a></p>
+      <p ><a href="../logout.do" target="_self">退出系统</a></p>
+</div>

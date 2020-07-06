@@ -1,0 +1,8 @@
+﻿<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><div id="left">
+      <p><a href="../manager/taskview.jsp" target="_self">查看任务</a></p>
+      <p><a href="../manager/task.jsp" target="_self">制定任务</a></p>
+      <p><a href="../manager/taskundone.jsp" target="_self">调整任务</a></p>
+      <p><a href="../manager/intendance.jsp" target="_self">跟踪任务</a></p>
+      <p><a href="../manager/checkper.jsp" target="_self">查看人员</a></p>
+      <p><a href="../login.jsp" target="_self">退出系统</a></p>
+</div>
