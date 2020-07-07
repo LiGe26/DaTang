@@ -6,15 +6,21 @@ import com.xk.task.data.dao.ITTaskDAO;
 import com.xk.task.service.ITEmployeeService;
 import com.xk.task.service.ITPlanService;
 import com.xk.task.service.ITTaskService;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:spring-mvc.xml")
+@ContextConfiguration(locations = "classpath:applicationContext.xml")
+
 public class TestService {
 
     @Resource(name = "empService")
@@ -30,10 +36,14 @@ public class TestService {
     @Resource(name = "taskDao")
     ITTaskDAO dao1;
 
+//    @Autowired
+//    SqlSessionTemplate sqlSession;
     @Test
-    public void test(){
-        System.out.println(service.login("zhangsan","123456"));
-        System.out.println(dao.queryAllRoles());
+    public void test() throws Exception {
+//        System.out.println(service.login("zhangsan","123456"));
+//        System.out.println(dao.queryAllRoles());
+
+        System.out.println("根据编号查询员工"+ dao.queryRoleById(2));
 
     }
 

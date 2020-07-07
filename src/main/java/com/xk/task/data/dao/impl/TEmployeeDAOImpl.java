@@ -4,14 +4,12 @@ import com.xk.task.data.dao.ITEmployeeDAO;
 import com.xk.task.data.pojo.TEmployee;
 import com.xk.task.data.pojo.TRole;
 import com.xk.task.data.util.DBUtil;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 
 @Component("empDao")
@@ -29,6 +27,8 @@ public class TEmployeeDAOImpl implements ITEmployeeDAO {
                     new TRole(rs.getInt("ROLE_ID")),new TEmployee(rs.getInt("PARENT_ID")));
         }
     };
+
+
     @Override
     public TEmployee login(TEmployee employee) {
         //and status=1  //用户在职状态
