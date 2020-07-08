@@ -12,44 +12,9 @@ import java.util.List;
 
 public interface ITTaskDAO {
 
-    /**
-     * 员工执行映射--》分配人主管
-     */
-//    RowMapper rowMapper=new RowMapper() {
-//        @Override
-//        public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-//            return new TTask(rs.getInt("TASK_ID"),rs.getString("TASK_NAME"),
-//                    rs.getTimestamp("BEGIN_DATE"),rs.getTimestamp("END_DATE"),
-//                    rs.getTimestamp("REAL_BEGIN_DATE"),rs.getTimestamp("REAL_END_DATE"),
-//                    rs.getString("STATUS"),new TEmployee(rs.getInt("IMPLEMENTOR_ID")),
-//                    new TEmployee(rs.getInt("ASSIGNER_ID"),rs.getString("reaL_Name")),rs.getString("TASK_DESC"));
-//        }
-//    };
-//    /**
-//     * 主管执行是映射--》实施人（接受任务的）员工
-//     */
-//    RowMapper rowMapperImplementor=new RowMapper() {
-//        @Override
-//        public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-//            return new TTask(rs.getInt("TASK_ID"),rs.getString("TASK_NAME"),
-//                    rs.getTimestamp("BEGIN_DATE"),rs.getTimestamp("END_DATE"),
-//                    rs.getTimestamp("REAL_BEGIN_DATE"),rs.getTimestamp("REAL_END_DATE"),
-//                    rs.getString("STATUS"),new TEmployee(rs.getInt("IMPLEMENTOR_ID"),rs.getString("reaL_Name")),
-//                    new TEmployee(rs.getInt("ASSIGNER_ID")),rs.getString("TASK_DESC"));
-//        }
-//    };
 
-
-//    RowMapper rowMapper=new RowMapper() {
-        //        @Override
-//        public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-//            return new TTask(rs.getInt("TASK_ID"),rs.getString("TASK_NAME"),
-//                    rs.getTimestamp("BEGIN_DATE"),rs.getTimestamp("END_DATE"),
-//                    rs.getTimestamp("REAL_BEGIN_DATE"),rs.getTimestamp("REAL_END_DATE"),
-//                    rs.getString("STATUS"),new TEmployee(rs.getInt("IMPLEMENTOR_ID")),
-//                    new TEmployee(rs.getInt("ASSIGNER_ID"),rs.getString("reaL_Name")),rs.getString("TASK_DESC"));
-//        }
     @Select("select * from T_TASK t inner join T_EMPLOYEE TE on t.ASSIGNER_ID = TE.EMPLOYEE_ID  where IMPLEMENTOR_ID=#{id}")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE,useCache = true,timeout = 10000)
     @Results(id = "assignerTaskMapper",value = {
             @Result(id = true,column = "task_Id",property = "task_Id",javaType = int.class),
             @Result(column = "task_Name",property = "task_Name",javaType = String.class),
@@ -69,6 +34,7 @@ public interface ITTaskDAO {
             "t.*,TE.* from T_TASK t inner join T_EMPLOYEE TE on t.ASSIGNER_ID = TE.EMPLOYEE_ID  " +
             "where IMPLEMENTOR_ID=#{empId}) where rm between #{start} and #{end}")
     @ResultMap("assignerTaskMapper")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE,useCache = true,timeout = 10000)
     public List<TTask> queryTaskListAndAssignerByPaging(@Param("empId") int empId,@Param("start") int start,@Param("end")int end) ;
 
     @Select("select count(*) from T_TASK t inner join T_EMPLOYEE TE on t.ASSIGNER_ID = TE.EMPLOYEE_ID  where IMPLEMENTOR_ID=#{empId}")
@@ -86,18 +52,88 @@ public interface ITTaskDAO {
     public int addTask(TTask task);
 
 
+    @Select("select * from T_TASK t inner join T_EMPLOYEE TE on t.IMPLEMENTOR_ID = TE.EMPLOYEE_ID  where t.ASSIGNER_ID=#{empId}")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE,useCache = true,timeout = 10000)
+    @Results(id = "implementorTaskMapper",value = {
+            @Result(id = true,column = "task_Id",property = "task_Id",javaType = int.class),
+            @Result(column = "task_Name",property = "task_Name",javaType = String.class),
+            @Result(column = "begin_Date",property = "begin_Date",javaType = Date.class),
+            @Result(column = "end_Date",property = "end_Date",javaType = Date.class),
+            @Result(column = "real_Begin_Date",property = "real_Begin_Date",javaType = Date.class),
+            @Result(column = "real_End_Date",property = "real_End_Date",javaType = Date.class),
+            @Result(column = "status",property = "status",javaType = String.class),
+            @Result(column = "IMPLEMENTOR_ID",property ="implementor.employee_Id",javaType = int.class),
+            @Result(column = "reaL_Name",property ="implementor.reaL_Name",javaType = String.class),
+            @Result(column = "ASSIGNER_ID",property ="assigner.employee_Id",javaType = int.class),
+            @Result(column = "TASK_DESC",property ="task_Desc",javaType = String.class)
+    })
+    public List<TTask> queryTaskListAndImplementor(int empId);
+
+
+    @Select("select * from(select row_number()  over ( order by t.TASK_ID desc) rm," +
+            "t.*,TE.* from T_TASK t inner join T_EMPLOYEE TE on t.IMPLEMENTOR_ID = TE.EMPLOYEE_ID" +
+            "  where t.ASSIGNER_ID=#{empId}) where rm between #{start} and #{end}")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE,useCache = true,timeout = 10000)
+    @ResultMap("implementorTaskMapper")
+    public List<TTask> queryTaskListAndImplementorByPaging(@Param("empId") int empId,@Param("start") int start,@Param("end")int end);
 
 
 
+    @Select("select * from (select t.*,row_number()  over ( order by t.TASK_ID desc) rm," +
+            "te.* from T_TASK t inner join T_EMPLOYEE te on t.IMPLEMENTOR_ID = TE.EMPLOYEE_ID  " +
+            "where t.ASSIGNER_ID=#{managerId} and STATUS='待实施' )temp where temp.rm between #{start} and #{end}")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE,useCache = true,timeout = 10000)
+    @ResultMap("implementorTaskMapper")
+    public List<TTask> queryTaskUnDoneByManagerIdByPaging(@Param("managerId") int managerId,@Param("start")int start,@Param("end")int end);
 
 
+    @Select("select * from (select row_number()  over ( order by t.TASK_ID desc) rm," +
+            "t.*,te.* from T_TASK t inner join T_EMPLOYEE te on t.IMPLEMENTOR_ID = te.EMPLOYEE_ID  " +
+            "where t.ASSIGNER_ID=#{managerId} and STATUS='实施中' )temp where temp.rm between #{start} and #{end}")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE,useCache = true,timeout = 10000)
+    @ResultMap("implementorTaskMapper")
+    public List<TTask> queryTaskDoneByManagerIdByPaging(@Param("managerId") int managerId,@Param("start")int start,@Param("end")int end);
 
 
-    public List<TTask> queryTaskListAndAssigner(String sql,Object [] params);
+    @Select("select count(*) from T_TASK t inner join T_EMPLOYEE TE on t.IMPLEMENTOR_ID = TE.EMPLOYEE_ID  " +
+            "where ASSIGNER_ID=#{managerId} and STATUS='待实施'")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE,useCache = true,timeout = 10000)
+    @ResultType(int.class)
+    public int queryTaskUnDoneByManagerTotalRecords(int managerId);
 
-    public List<TTask> queryTaskListAndImplementor(String sql, Object[] params);
+    @Select("select count(*) from T_TASK t inner join T_EMPLOYEE TE on t.IMPLEMENTOR_ID = TE.EMPLOYEE_ID  where ASSIGNER_ID=#{managerId} and STATUS='实施中'")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE,useCache = true,timeout = 10000)
+    @ResultType(int.class)
+    public int queryTaskDoneByManagerTotalRecords(int managerId);
 
-    public int updateTask(String sql,Object [] params);
 
-    public int getTotalTaskRecordCount(String sql,Object [] params);
+    @Select("select * from T_TASK t inner join T_EMPLOYEE TE on t.IMPLEMENTOR_ID = TE.EMPLOYEE_ID  where TASK_ID=#{taskId}")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE,useCache = true,timeout = 10000)
+    @ResultMap("implementorTaskMapper")
+    public TTask queryTaskAndImplementorByTaskId(int taskId);
+
+
+    @Select("select count(*) from T_TASK t inner join T_EMPLOYEE TE on t.IMPLEMENTOR_ID = TE.EMPLOYEE_ID  where ASSIGNER_ID=#{managerId}")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE,useCache = true,timeout = 10000)
+    @ResultType(int.class)
+    public int queryTaskListAndImplementorTotalCount(int managerId);
+
+
+    @Update("update T_TASK set TASK_NAME=#{task_Name},BEGIN_DATE=#{begin_Date},END_DATE=#{end_Date}," +
+            "TASK_DESC=#{task_Desc},IMPLEMENTOR_ID=#{implementor.employee_Id} where TASK_ID=#{task_Id}")
+    public int updateTaskBytaskId(TTask task);
+
+
+    @Delete(  "<script>delete T_TASK where TASK_ID=0"
+            + "<foreach item='id' index='index' collection='array' >"
+            + "or TASK_ID=#{id}"
+            + "</foreach>"
+            + "</script>")
+    public int deleteTaskByIds(Integer[] deleteIds);
+
+
+    @Update("update T_TASK set STATUS='已完成' where TASK_ID=#{taskId}")
+    public int finishTask(int taskId);
+
+
 }

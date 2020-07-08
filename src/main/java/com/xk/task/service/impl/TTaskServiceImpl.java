@@ -53,82 +53,59 @@ public class TTaskServiceImpl implements ITTaskService {
      */
     @Override
     public List<TTask> queryTaskListAndImplementor(int empId) {
-        //任务--》主管通过员工表连表查询
-        String sql="select * from T_TASK t inner join T_EMPLOYEE TE on t.IMPLEMENTOR_ID = TE.EMPLOYEE_ID  where t.ASSIGNER_ID=?";
-        return dao.queryTaskListAndImplementor(sql,new Object[]{empId});
+        return dao.queryTaskListAndImplementor(empId);
     }
 
     @Override
     public List<TTask> queryTaskListAndImplementorByPaging(int empId, int start, int end) {
-        String sql="select * from(select row_number()  over ( order by t.TASK_ID desc) rm,t.*,TE.* from T_TASK t inner join T_EMPLOYEE TE on t.IMPLEMENTOR_ID = TE.EMPLOYEE_ID  where t.ASSIGNER_ID=? ) temp where temp.rm between ? and ?";
-        return dao.queryTaskListAndImplementor(sql,new Object[]{empId,start,end});
+        return dao.queryTaskListAndImplementorByPaging(empId,start,end);
     }
 
     @Override
-    public List<TTask> queryTaskUnDoneByManagerIdByPaging(int ManagerId,int start,int end) {
-        String sql="select * from (select t.*,row_number()  over ( order by t.TASK_ID desc) rm,te.* from T_TASK t inner join T_EMPLOYEE te on t.IMPLEMENTOR_ID = TE.EMPLOYEE_ID  where t.ASSIGNER_ID=? and STATUS='待实施' )temp where temp.rm between ? and ?";
-        return dao.queryTaskListAndImplementor(sql,new Object[]{ManagerId,start,end});
+    public List<TTask> queryTaskUnDoneByManagerIdByPaging(int managerId,int start,int end) {
+        return dao.queryTaskUnDoneByManagerIdByPaging(managerId,start,end);
     }
 
     @Override
-    public List<TTask> queryTaskDoneByManagerIdByPaging(int ManagerId,int start,int end) {
-        String sql="select * from (select row_number()  over ( order by t.TASK_ID desc) rm,t.*,te.* from T_TASK t inner join T_EMPLOYEE te on t.IMPLEMENTOR_ID = te.EMPLOYEE_ID  where t.ASSIGNER_ID=? and STATUS='实施中' )temp where temp.rm between ? and ?";
-        return dao.queryTaskListAndImplementor(sql,new Object[]{ManagerId,start,end});
+    public List<TTask> queryTaskDoneByManagerIdByPaging(int managerId,int start,int end) {
+        return dao.queryTaskDoneByManagerIdByPaging(managerId,start,end);
     }
 
     @Override
     public int queryTaskUnDoneByManagerTotalRecords(int managerId) {
-        String sql="select count(*) from T_TASK t inner join T_EMPLOYEE TE on t.IMPLEMENTOR_ID = TE.EMPLOYEE_ID  where ASSIGNER_ID=? and STATUS='待实施'";
-        return dao.getTotalTaskRecordCount(sql,new Object[]{managerId});
+        return dao.queryTaskUnDoneByManagerTotalRecords(managerId);
     }
 
     @Override
     public int queryTaskDoneByManagerTotalRecords(int managerId) {
-        String sql="select count(*) from T_TASK t inner join T_EMPLOYEE TE on t.IMPLEMENTOR_ID = TE.EMPLOYEE_ID  where ASSIGNER_ID=? and STATUS='实施中'";
-        return dao.getTotalTaskRecordCount(sql,new Object[]{managerId});
+        return dao.queryTaskDoneByManagerTotalRecords(managerId);
     }
 
     @Override
     public TTask queryTaskAndImplementorByTaskId(int taskId) {
-        String sql="select * from T_TASK t inner join T_EMPLOYEE TE on t.IMPLEMENTOR_ID = TE.EMPLOYEE_ID  where TASK_ID=?";
-        return dao.queryTaskListAndImplementor(sql,new Object[]{taskId}).get(0);
+        return dao.queryTaskAndImplementorByTaskId(taskId);
     }
 
     @Override
     public int queryTaskListAndImplementorTotalCount(int managerId) {
-        String sql="select count(*) from T_TASK t inner join T_EMPLOYEE TE on t.IMPLEMENTOR_ID = TE.EMPLOYEE_ID  where ASSIGNER_ID=?" ;
-        return dao.getTotalTaskRecordCount(sql,new Object[]{managerId});
+        return dao.queryTaskListAndImplementorTotalCount(managerId);
     }
 
     @Override
     public int updateTaskBytaskId(TTask task) {
-        String sql="update T_TASK set TASK_NAME=?,BEGIN_DATE=?,END_DATE=?,TASK_DESC=?,IMPLEMENTOR_ID=? where TASK_ID=?";
-        return dao.updateTask(sql,new Object[]{task.getTask_Name(),task.getBegin_Date(),task.getEnd_Date(),
-                task.getTask_Desc(),task.getImplementor().getEmployee_Id(),task.getTask_Id()});
+        return dao.updateTaskBytaskId(task);
     }
 
     @Override
     public int deleteTaskByIds(Integer[] deleteIds) {
-        StringBuffer sbf=new StringBuffer();
-        sbf.append("delete T_TASK where TASK_ID=0 ");
-        if(deleteIds!=null){
-            //不为空 拼接sql
-            for (Integer id:deleteIds){
-                sbf.append(" or TASK_ID=? ");
-            }
-            System.out.println(sbf.toString());
-            dao.updateTask(sbf.toString(),deleteIds);//删除多条数据成功会返回0
-            return 1;//代表删除成功
-        }else {
-            return 0;
-        }
+
+        return  dao.deleteTaskByIds(deleteIds);
 
     }
 
     @Override
     public int finishTask(int taskId) {
-        String sql="update T_TASK set STATUS='已完成' where TASK_ID=?";
-        return dao.updateTask(sql,new Object[]{taskId});
+        return dao.finishTask(taskId);
     }
 
 }

@@ -77,71 +77,105 @@ public class TTaskDAOImpl extends SqlSessionDaoSupport implements ITTaskDAO {
         return count;
     }
 
-
-    private JdbcTemplate template=new JdbcTemplate(DBUtil.getDataSource());
-    /**
-     * 员工执行映射--》分配人主管
-     */
-    RowMapper rowMapper=new RowMapper() {
-        @Override
-        public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return new TTask(rs.getInt("TASK_ID"),rs.getString("TASK_NAME"),
-                    rs.getTimestamp("BEGIN_DATE"),rs.getTimestamp("END_DATE"),
-                    rs.getTimestamp("REAL_BEGIN_DATE"),rs.getTimestamp("REAL_END_DATE"),
-                    rs.getString("STATUS"),new TEmployee(rs.getInt("IMPLEMENTOR_ID")),
-                    new TEmployee(rs.getInt("ASSIGNER_ID"),rs.getString("reaL_Name")),rs.getString("TASK_DESC"));
-        }
-    };
-    /**
-     * 主管执行是映射--》实施人（接受任务的）员工
-     */
-    RowMapper rowMapperImplementor=new RowMapper() {
-        @Override
-        public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return new TTask(rs.getInt("TASK_ID"),rs.getString("TASK_NAME"),
-                    rs.getTimestamp("BEGIN_DATE"),rs.getTimestamp("END_DATE"),
-                    rs.getTimestamp("REAL_BEGIN_DATE"),rs.getTimestamp("REAL_END_DATE"),
-                    rs.getString("STATUS"),new TEmployee(rs.getInt("IMPLEMENTOR_ID"),rs.getString("reaL_Name")),
-                    new TEmployee(rs.getInt("ASSIGNER_ID")),rs.getString("TASK_DESC"));
-        }
-    };
-
-
-
     @Override
-    public List<TTask> queryTaskListAndAssigner(String sql, Object[] params) {
-        try {
-            return template.query(sql,params,rowMapper);
-        }catch (Exception e){
-            e.printStackTrace();
-            System.out.println("未查询到任务");
-            return null;
-        }
-    }
-
-
-    @Override
-    public List<TTask> queryTaskListAndImplementor(String sql, Object[] params) {
-        try {
-            return template.query(sql,params,rowMapperImplementor);
-        }catch (Exception e){
-            e.printStackTrace();
-            System.out.println("未查询到任务");
-            return null;
-
-        }
-
-    }
-
-
-
-    @Override
-    public int updateTask(String sql, Object[] params) {
-        return template.update(sql,params);
+    public List<TTask> queryTaskListAndImplementor(int empId) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+        List<TTask>  tasks=dao.queryTaskListAndImplementor(empId);
+        sqlSession.close();
+        return tasks;
     }
 
     @Override
-    public int getTotalTaskRecordCount(String sql, Object[] params) {
-        return template.queryForInt(sql,params);
+    public List<TTask> queryTaskListAndImplementorByPaging(int empId, int start, int end) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+        List<TTask>  tasks=dao.queryTaskListAndImplementorByPaging(empId,start,end);
+        sqlSession.close();
+        return tasks;
     }
+
+    @Override
+    public List<TTask> queryTaskUnDoneByManagerIdByPaging(int managerId, int start, int end) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+        List<TTask>  tasks=dao.queryTaskUnDoneByManagerIdByPaging(managerId,start,end);
+        sqlSession.close();
+        return tasks;
+    }
+
+    @Override
+    public List<TTask> queryTaskDoneByManagerIdByPaging(int managerId, int start, int end) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+        List<TTask>  tasks=dao.queryTaskDoneByManagerIdByPaging(managerId,start,end);
+        sqlSession.close();
+        return tasks;
+    }
+
+    @Override
+    public int queryTaskUnDoneByManagerTotalRecords(int managerId) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+        int  count=dao.queryTaskUnDoneByManagerTotalRecords(managerId);
+        sqlSession.close();
+        return count;
+    }
+
+    @Override
+    public int queryTaskDoneByManagerTotalRecords(int managerId) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+        int  count=dao.queryTaskDoneByManagerTotalRecords(managerId);
+        sqlSession.close();
+        return count;
+    }
+
+    @Override
+    public TTask queryTaskAndImplementorByTaskId(int taskId) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+        TTask  task=dao.queryTaskAndImplementorByTaskId(taskId);
+        sqlSession.close();
+        return task;
+    }
+
+    @Override
+    public int queryTaskListAndImplementorTotalCount(int managerId) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+        int count=dao.queryTaskListAndImplementorTotalCount(managerId);
+        sqlSession.close();
+        return count;
+    }
+
+    @Override
+    public int updateTaskBytaskId(TTask task) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+        int count=dao.updateTaskBytaskId(task);
+        sqlSession.close();
+        return count;
+    }
+
+    @Override
+    public int deleteTaskByIds(Integer[] deleteIds) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+        int count=dao.deleteTaskByIds(deleteIds);
+        sqlSession.close();
+        return count;
+    }
+
+    @Override
+    public int finishTask(int taskId) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+        int count=dao.finishTask(taskId);
+        sqlSession.close();
+        return count;
+    }
+
+
+
 }
