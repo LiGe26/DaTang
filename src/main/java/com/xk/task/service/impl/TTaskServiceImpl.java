@@ -23,37 +23,27 @@ public class TTaskServiceImpl implements ITTaskService {
      */
     @Override
     public List<TTask> queryTaskListAndAssigner(int empId) {
-        //任务--》查詢对应分配人
-        String sql="select * from T_TASK t inner join T_EMPLOYEE TE on t.ASSIGNER_ID = TE.EMPLOYEE_ID  where IMPLEMENTOR_ID=?";
-        return dao.queryTaskListAndAssigner(sql,new Object[]{empId});
+        return dao.queryTaskListAndAssigner(empId);
     }
     @Override
     public List<TTask> queryTaskListAndAssignerByPaging(int empId,int start,int end) {
-        //任务--=》+查詢对应分配人
-        String sql="select * from(select row_number()  over ( order by t.TASK_ID desc) rm,t.*,TE.* from T_TASK t inner join T_EMPLOYEE TE on t.ASSIGNER_ID = TE.EMPLOYEE_ID  where IMPLEMENTOR_ID=?)" +
-                "where rm between ? and ?";
-        return dao.queryTaskListAndAssigner(sql,new Object[]{empId,start,end});
+        return dao.queryTaskListAndAssignerByPaging(empId,start,end);
     }
 
     @Override
     public int queryTaskListAndAssignerTotalCount(int empId) {
         //任务--=》+查詢对应分配人
-        String sql="select count(*) from T_TASK t inner join T_EMPLOYEE TE on t.ASSIGNER_ID = TE.EMPLOYEE_ID  where IMPLEMENTOR_ID=?";
-        return dao.getTotalTaskRecordCount(sql,new Object[]{empId});
+        return dao.queryTaskListAndAssignerTotalCount(empId);
     }
 
     @Override
     public int updateTaskStatusBegin(int taskId) {
-        String sql="update T_TASK set STATUS='实施中' where TASK_ID=?" ;
-        return dao.updateTask(sql,new Object[]{taskId});
+        return dao.updateTaskStatusBegin(taskId);
     }
 
     @Override
     public int addTask(TTask task) {
-        String sql="insert into T_TASK values(0,?,?,?,null,null,'待实施',?,?,?)";
-        return dao.updateTask(sql,new Object[]{task.getTask_Name(),task.getBegin_Date(),task.getEnd_Date(),
-        task.getImplementor().getEmployee_Id(),task.getAssigner().getEmployee_Id()
-        ,task.getTask_Desc()});
+        return dao.addTask(task);
     }
 
     /**

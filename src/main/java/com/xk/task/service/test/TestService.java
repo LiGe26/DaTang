@@ -43,8 +43,13 @@ public class TestService {
 //        System.out.println(service.login("zhangsan","123456"));
 //        System.out.println(dao.queryAllRoles());
 
-        System.out.println("根据编号查询员工"+ dao.queryRoleById(2));
-
+//        System.out.println("根据编号查询角色"+ dao.queryRoleById(2));
+//        System.out.println("查询所有角色:"+dao.queryAllRoles());
+//
+//        System.out.println(taskService.queryTaskListAndAssigner(6));
+        System.out.println(taskService.queryTaskListAndAssignerByPaging(6,1,5));
+        System.out.println("6号员工任务总数"+taskService.queryTaskListAndAssignerTotalCount(6));
+        System.out.println("修改任务状态为实施受影响行数："+taskService.updateTaskStatusBegin(61));
     }
 
 

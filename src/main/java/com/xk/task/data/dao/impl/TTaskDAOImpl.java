@@ -1,20 +1,83 @@
 package com.xk.task.data.dao.impl;
 
+import com.xk.task.data.dao.ITRoleDAO;
 import com.xk.task.data.dao.ITTaskDAO;
 import com.xk.task.data.pojo.TEmployee;
+
 import com.xk.task.data.pojo.TRole;
 import com.xk.task.data.pojo.TTask;
 import com.xk.task.data.util.DBUtil;
+
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-@Component("taskDao")
-public class TTaskDAOImpl implements ITTaskDAO {
+@Repository("taskDao")
+public class TTaskDAOImpl extends SqlSessionDaoSupport implements ITTaskDAO {
+
+    @Resource(name = "sqlSessionFactory")
+    SqlSessionFactory sqlSessionFactory;
+
+    @PostConstruct
+    public void init(){
+        setSqlSessionFactory(sqlSessionFactory);
+    }
+    @Override
+    public List<TTask> queryTaskListAndAssigner(int empId) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+
+        List<TTask>  tasks=dao.queryTaskListAndAssigner(empId);
+        sqlSession.close();
+        return tasks;
+    }
+
+    @Override
+    public List<TTask> queryTaskListAndAssignerByPaging(int empId, int start, int end) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+        List<TTask>  tasks=dao.queryTaskListAndAssignerByPaging(empId,start,end);
+        sqlSession.close();
+        return tasks;
+    }
+
+    @Override
+    public int queryTaskListAndAssignerTotalCount(int empId) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+        int  count=dao.queryTaskListAndAssignerTotalCount(empId);
+        sqlSession.close();
+        return count;
+    }
+
+    @Override
+    public int updateTaskStatusBegin(int taskId) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+        int  count=dao.updateTaskStatusBegin(taskId);
+        sqlSession.close();
+        return count;
+    }
+
+    @Override
+    public int addTask(TTask task) {
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITTaskDAO dao= sqlSession.getMapper(ITTaskDAO.class);
+        int  count=dao.addTask(task);
+        sqlSession.close();
+        return count;
+    }
+
+
     private JdbcTemplate template=new JdbcTemplate(DBUtil.getDataSource());
     /**
      * 员工执行映射--》分配人主管
@@ -44,6 +107,7 @@ public class TTaskDAOImpl implements ITTaskDAO {
     };
 
 
+
     @Override
     public List<TTask> queryTaskListAndAssigner(String sql, Object[] params) {
         try {
@@ -52,9 +116,7 @@ public class TTaskDAOImpl implements ITTaskDAO {
             e.printStackTrace();
             System.out.println("未查询到任务");
             return null;
-
         }
-
     }
 
 

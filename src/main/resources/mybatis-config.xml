@@ -6,10 +6,9 @@
 
 <mappers>
     <mapper class="com.xk.task.data.dao.ITRoleDAO"></mapper>
-<!--    <mapper class="com.xk.task.data.dao.ITTaskDAO"></mapper>-->
-<!--    <mapper class="com.xk.task.data.dao.ITPlanDAO"></mapper>-->
-
-<!--    <mapper class="com.xk.task.data.dao.ITTaskDAO"></mapper>-->
+    <mapper class="com.xk.task.data.dao.ITTaskDAO"></mapper>
+    <mapper class="com.xk.task.data.dao.ITPlanDAO"></mapper>
+    <mapper class="com.xk.task.data.dao.ITEmployeeDAO"></mapper>
 </mappers>
 
 
