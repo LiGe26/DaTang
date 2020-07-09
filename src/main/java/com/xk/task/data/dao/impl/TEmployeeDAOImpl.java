@@ -21,7 +21,7 @@ import java.util.List;
 @Repository("empDao")
 public class TEmployeeDAOImpl extends SqlSessionDaoSupport implements ITEmployeeDAO {
 
-    private JdbcTemplate template = new JdbcTemplate(DBUtil.getDataSource());
+
     @Resource(name = "sqlSessionFactory")
     SqlSessionFactory sqlSessionFactory;
 

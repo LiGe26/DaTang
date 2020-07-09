@@ -1,6 +1,7 @@
 package com.xk.task.data.dao;
 
 import com.xk.task.data.pojo.TPlan;
+import com.xk.task.web.util.PlanDTO;
 import org.apache.ibatis.annotations.*;
 
 import java.util.Date;
@@ -46,7 +47,7 @@ public interface ITPlanDAO {
      * @param objs
      * @return
      */
-    @Delete(  "<script>delete T_PLAN where plan_Id=0"
+    @Delete(  "<script>"
             + "<foreach item='id' index='index' collection='array' >"
             + "or plan_Id=#{id}"
             + "</foreach>"
@@ -56,9 +57,119 @@ public interface ITPlanDAO {
     @Update("update T_PLAN set status=#{status},IS_FEEDBACK=#{is_Feedback},FEEDBACK_INFO=#{feedback_Info} where PLAN_ID=#{plan_Id} ")
     public int updatePlanById(TPlan plan);
 
-    public List<TPlan> queryPlanList(String sql,Object [] params);
+    @Select("<script>"
 
-    public int queryPlanForInt(String sql,Object [] params);
+            + "<if test='dto.search_loginId !=0'>"
+            + "select * from T_PLAN inner join T_TASK TT on T_PLAN.TASK_ID = TT.TASK_ID where IMPLEMENTOR_ID=#{dto.search_loginId} "
+            + "</if>"
+
+            +"<if test='dto.search_loginId ==0'>"
+            + "select * from T_PLAN where 1=1 "
+            + "</if>"
+
+            + "<if test='dto.search_Plan_Name!=null and dto.search_Plan_Name!=\"\"'>"
+            + " and PLAN_NAME like '%'||#{dto.search_Plan_Name}||'%'"
+            + "</if>"
+
+            + "<if test='dto.search_Task_Id!=0'>"
+            + " and TASK_ID=#{dto.search_Task_Id} "
+            + "</if>"
+
+            + "<if test='dto.search_Begin_Date1 !=null and dto.search_Begin_Date2!=null'>"
+            + "<if test='dto.search_Begin_Date1.before(dto.search_Begin_Date2)'>"
+            + " and tp.BEGIN_DATE between #{dto.search_Begin_Date1} and #{dto.search_Begin_Date2} "
+            + "</if>"
+            + "</if>"
+
+            + "<if test='dto.search_End_Date1 !=null and dto.search_End_Date2!=null'>"
+            + "<if test='dto.search_End_Date1.before(dto.search_End_Date2)'>"
+            + " and END_DATE between #{dto.search_End_Date1} and #{dto.search_End_Date2} "
+            + "</if>"
+            + "</if>"
+
+            + "<if test='dto.search_Is_Feedback!=null and dto.search_Is_Feedback!=\"\"'>"
+            + " and IS_FEEDBACK=#{dto.search_Is_Feedback}"
+            + "</if>"
+
+            + "</script>")
+    public List<TPlan> advanceQueryPlan(@Param("dto") PlanDTO dto);
+
+    @Select("<script>"
+
+            + "<if test='dto.search_loginId !=0'>"
+            + "select * from (select ROWNUM rm,tp.* from T_PLAN tp inner join T_TASK tt on tp.TASK_ID = tt.TASK_ID where tt.IMPLEMENTOR_ID=#{dto.search_loginId} "
+            + "</if>"
+
+            +"<if test='dto.search_loginId ==0'>"
+            + "select * from (select ROWNUM rm,tp.* from T_PLAN tp where 1=1 "
+            + "</if>"
+
+            + "<if test='dto.search_Plan_Name!=null and dto.search_Plan_Name!=\"\"'>"
+            + " and PLAN_NAME like '%'||#{dto.search_Plan_Name}||'%'"
+            + "</if>"
+
+            + "<if test='dto.search_Task_Id!=0'>"
+            + " and TASK_ID=#{dto.search_Task_Id} "
+            + "</if>"
+
+            + "<if test='dto.search_Begin_Date1 !=null and dto.search_Begin_Date2!=null'>"
+            + "<if test='dto.search_Begin_Date1.before(dto.search_Begin_Date2)'>"
+            + " and tp.BEGIN_DATE between #{dto.search_Begin_Date1} and #{dto.search_Begin_Date2} "
+            + "</if>"
+            + "</if>"
+
+            + "<if test='dto.search_End_Date1 !=null and dto.search_End_Date2!=null'>"
+            + "<if test='dto.search_End_Date1.before(dto.search_End_Date2)'>"
+            + " and END_DATE between #{dto.search_End_Date1} and #{dto.search_End_Date2} "
+            + "</if>"
+            + "</if>"
+
+            + "<if test='dto.search_Is_Feedback!=null and dto.search_Is_Feedback!=\"\"'>"
+            + " and IS_FEEDBACK=#{dto.search_Is_Feedback}"
+            + "</if>"
+
+
+            +") temp where temp.rm between #{start} and #{end}"
+            + "</script>")
+    public List<TPlan> advanceQueryPlanByPaging(@Param("dto") PlanDTO dto,@Param("start") int start,@Param("end") int end);
+
+    @Select("<script>"
+            + "<if test='dto.search_loginId !=0'>"
+            + "select * from (select count(*) from T_PLAN tp inner join T_TASK tt on tp.TASK_ID = tt.TASK_ID where tt.IMPLEMENTOR_ID=#{dto.search_loginId} "
+            + "</if>"
+
+            +"<if test='dto.search_loginId ==0'>"
+            + "select count(*)  from T_PLAN tp where 1=1 "
+            + "</if>"
+
+            + "<if test='dto.search_Plan_Name!=null and dto.search_Plan_Name!=\"\"'>"
+            + " and PLAN_NAME like '%'||#{dto.search_Plan_Name}||'%'"
+            + "</if>"
+
+            + "<if test='dto.search_Task_Id!=0'>"
+            + " and tp.TASK_ID=#{search_Task_Id} "
+            + "</if>"
+
+            + "<if test='dto.search_Begin_Date1 !=null and dto.search_Begin_Date2!=null'>"
+            + "<if test='dto.search_Begin_Date1.before(dto.search_Begin_Date2)'>"
+            + " and tp.BEGIN_DATE between #{dto.search_End_Date1} and #{dto.search_End_Date2} "
+            + "</if>"
+            + "</if>"
+
+            + "<if test='dto.search_End_Date1 !=null and dto.search_End_Date2!=null'>"
+            + "<if test='dto.search_End_Date1.before(dto.search_End_Date2)'>"
+            + " and tp.END_DATE #{dto.search_End_Date1} and #{dto.search_End_Date2} "
+            + "</if>"
+            + "</if>"
+
+            + "<if test='dto.search_Is_Feedback!=null and dto.search_Is_Feedback!=\"\"'>"
+            + " and tp.IS_FEEDBACK=#{dto.search_Is_Feedback}"
+            + "</if>"
+
+            + "</script>")
+    public int advanceQueryPlanTotalCount(@Param("dto") PlanDTO dto);
+
+
 
 
 }

@@ -91,7 +91,16 @@ public class TPlanDAOImpl extends SqlSessionDaoSupport implements ITPlanDAO {
 
     @Override
     public int deletePlan(Integer[] objs) {
-        return 0;
+        int count=0;
+        try {
+            SqlSession session=sqlSessionFactory.openSession();
+            ITPlanDAO dao=session.getMapper(ITPlanDAO.class);
+            count=dao.deletePlan(objs);
+            session.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return count;
     }
 
     @Override
@@ -109,13 +118,46 @@ public class TPlanDAOImpl extends SqlSessionDaoSupport implements ITPlanDAO {
     }
 
     @Override
-    public List<TPlan> queryPlanList(String sql, Object[] params) {
-        return template.query(sql,params,rowMapper);
+    public List<TPlan> advanceQueryPlan(PlanDTO dto) {
+        List<TPlan> allPlan=null;
+        try {
+            SqlSession session=sqlSessionFactory.openSession();
+            ITPlanDAO dao=session.getMapper(ITPlanDAO.class);
+            allPlan=dao.advanceQueryPlan(dto);
+            session.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return allPlan;
     }
 
     @Override
-    public int queryPlanForInt(String sql, Object[] params) {
-        return template.queryForInt(sql,params);
+    public List<TPlan> advanceQueryPlanByPaging(PlanDTO dto, int start, int end) {
+        List<TPlan> allPlan=null;
+        try {
+            SqlSession session=sqlSessionFactory.openSession();
+            ITPlanDAO dao=session.getMapper(ITPlanDAO.class);
+            allPlan=dao.advanceQueryPlanByPaging(dto,start,end);
+            session.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return allPlan;
     }
+
+    @Override
+    public int advanceQueryPlanTotalCount(PlanDTO dto) {
+        int count=0;
+        try {
+            SqlSession session=sqlSessionFactory.openSession();
+            ITPlanDAO dao=session.getMapper(ITPlanDAO.class);
+            count=dao.advanceQueryPlanTotalCount(dto);
+            session.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return count;
+    }
+
 
 }
