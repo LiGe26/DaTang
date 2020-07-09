@@ -116,6 +116,16 @@ public class TEmployeeDAOImpl extends SqlSessionDaoSupport implements ITEmployee
     }
 
     @Override
+    public int queryPersonsByManagerIdTotalRecords(int managerId) {
+        System.out.println("执行添加的DAO");
+        SqlSession session=super.getSqlSession();
+       ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
+        int num=dao.queryPersonsByManagerIdTotalRecords(managerId);
+        session.close();
+        return num;
+    }
+
+    @Override
     public List<TEmployee> queryAllEmployees(String sql,Object [] params) {
         return template.query(sql,params,rowMapper);
     }
@@ -123,13 +133,13 @@ public class TEmployeeDAOImpl extends SqlSessionDaoSupport implements ITEmployee
     @Override
     public int insertEmployee(TEmployee emp) {
         System.out.println("执行添加的DAO");
-        SqlSession session=super.getSqlSession();
-        int num=session.insert("com.xk.task.data.dao.ITEmployeeDAO.insertEmployee",emp);
+    SqlSession session=super.getSqlSession();
+    int num=session.insert("com.xk.task.data.dao.ITEmployeeDAO.insertEmployee",emp);
         System.out.println("返回添加记录的总数："+num);
         System.out.println("主键："+emp.getEmployee_Id());
-        int key=emp.getEmployee_Id();
+    int key=emp.getEmployee_Id();
         return key;
-    }
+}
 
     @Override
     public int deleteEmployee(int id) {
