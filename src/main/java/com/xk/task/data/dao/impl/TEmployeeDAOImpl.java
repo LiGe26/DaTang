@@ -4,18 +4,31 @@ import com.xk.task.data.dao.ITEmployeeDAO;
 import com.xk.task.data.pojo.TEmployee;
 import com.xk.task.data.pojo.TRole;
 import com.xk.task.data.util.DBUtil;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-@Component("empDao")
-public class TEmployeeDAOImpl implements ITEmployeeDAO {
-    private JdbcTemplate template=new JdbcTemplate(DBUtil.getDataSource());
+@Repository("empDao")
+public class TEmployeeDAOImpl extends SqlSessionDaoSupport implements ITEmployeeDAO {
 
+    private JdbcTemplate template=new JdbcTemplate(DBUtil.getDataSource());
+    @Resource(name = "sqlSessionFactory")
+    SqlSessionFactory sqlSessionFactory;
+
+    @PostConstruct
+    public void init(){
+        setSqlSessionFactory(sqlSessionFactory);
+    }
     //映射实体类
     RowMapper rowMapper=new RowMapper() {
         @Override
@@ -32,15 +45,74 @@ public class TEmployeeDAOImpl implements ITEmployeeDAO {
     @Override
     public TEmployee login(TEmployee employee) {
         //and status=1  //用户在职状态
-        String sql="select * from T_EMPLOYEE where EMPLOYEE_NAME=? and PASSWORD=? and workState=1";
+        TEmployee tEmployee=null;
         try {
-            return (TEmployee) template.queryForObject(sql,new Object[]{employee.getEmployee_Name(),
-                    employee.getPassword()},rowMapper);
+            SqlSession session=sqlSessionFactory.openSession();
+            ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
+            tEmployee=dao.login(employee);
+            session.close();
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("未查询到员工");
             return null;
         }
+        return tEmployee;
+    }
+
+    @Override
+    public List<TEmployee> getAllEmployess() {
+        List allEmployee=null;
+        try {
+            SqlSession session=sqlSessionFactory.openSession();
+            ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
+            allEmployee=dao.getAllEmployess();
+            session.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return allEmployee;
+    }
+
+    @Override
+    public List<TEmployee> getDents(int id) {
+        List allEmployee=null;
+        try {
+            SqlSession session=sqlSessionFactory.openSession();
+            ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
+            allEmployee=dao.getDents(id);
+            session.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return allEmployee;
+    }
+
+    @Override
+    public List<TEmployee> queryEmployeeById(int id) {
+        List<TEmployee> employee=null;
+        try {
+            SqlSession session=sqlSessionFactory.openSession();
+            ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
+            employee=dao.queryEmployeeById(id);
+            session.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return employee;
+    }
+
+    @Override
+    public List<TEmployee> queryPersonsByManagerId(int mangerId) {
+        List allEmployee=null;
+        try {
+            SqlSession session=sqlSessionFactory.openSession();
+            ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
+            allEmployee=dao.queryPersonsByManagerId(mangerId);
+            session.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return allEmployee;
     }
 
     @Override
@@ -50,11 +122,13 @@ public class TEmployeeDAOImpl implements ITEmployeeDAO {
 
     @Override
     public int insertEmployee(TEmployee emp) {
-        String sql="insert into T_EMPLOYEE values(0,?,?,?,?,?,?,?,?,?,?,?,?,1)";
-
-        return template.update(sql,new Object[]{emp.getEmployee_Name(),emp.getPassword(),
-        emp.getReaL_Name(),emp.getSex(),emp.getBirthday(),emp.getDuty(),emp.getEnrolldate(),
-        emp.getEducation(),emp.getMajor(),emp.getExperience(),emp.getRole().getRole_Id(),null});
+        System.out.println("执行添加的DAO");
+        SqlSession session=super.getSqlSession();
+        int num=session.insert("com.xk.task.data.dao.ITEmployeeDAO.insertEmployee",emp);
+        System.out.println("返回添加记录的总数："+num);
+        System.out.println("主键："+emp.getEmployee_Id());
+        int key=emp.getEmployee_Id();
+        return key;
     }
 
     @Override
@@ -62,16 +136,32 @@ public class TEmployeeDAOImpl implements ITEmployeeDAO {
 
 //        String sql3="delete T_EMPLOYEE where employee_Id =?";
         //修改员工的状态为离职状态
-        String sql="update T_EMPLOYEE set WORKSTATE=0 where EMPLOYEE_ID=?"; //根据编号修改员工离职状态
-        return template.update(sql,new Object[]{id});
+        int count=0;
+        try {
+            SqlSession session=sqlSessionFactory.openSession();
+            ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
+            count=dao.deleteEmployee(id);
+            System.out.println("返回删除的条数"+count);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return count;
     }
 
 
 
     @Override
     public int updateEmployeeParent(int empId, Integer parent_id) {
-        String sql="update T_EMPLOYEE set parent_id=? where employee_Id=?";
-        return template.update(sql,new Object[]{parent_id,empId});
+        int count=0;
+        try {
+            SqlSession session=sqlSessionFactory.openSession();
+            ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
+            count=dao.updateEmployeeParent(empId,parent_id);
+            System.out.println("返回删除的条数"+count);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return count;
     }
 
     @Override

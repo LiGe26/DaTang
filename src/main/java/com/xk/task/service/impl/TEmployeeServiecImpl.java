@@ -21,14 +21,12 @@ public class TEmployeeServiecImpl  implements ITEmployeeService {
 
     @Override
     public List<TEmployee> getAllEmployess() {
-        String sql="select * from T_EMPLOYEE";
-        return dao.queryAllEmployees(sql,null);
+        return dao.getAllEmployess();
     }
 
     @Override
     public List<TEmployee> getDents() {
-        String sql="select * from T_EMPLOYEE where role_id=? and WORKSTATE=1";
-        return dao.queryAllEmployees(sql,new Object[]{2});
+        return dao.getDents(2);
     }
 
     @Override
@@ -43,8 +41,7 @@ public class TEmployeeServiecImpl  implements ITEmployeeService {
 
     @Override
     public TEmployee queryEmployeeById(int id) {
-        String sql="select * from T_EMPLOYEE where employee_Id=?";
-        List<TEmployee> employees= dao.queryAllEmployees(sql,new Object[]{id});
+        List<TEmployee> employees= dao.queryEmployeeById(id);
         if(employees.size()>0){
             //查询到员工
             return employees.get(0);
@@ -59,8 +56,7 @@ public class TEmployeeServiecImpl  implements ITEmployeeService {
 
     @Override
     public List<TEmployee> queryPersonsByManagerId(int mangerId) {
-        String sql="select * from T_EMPLOYEE where PARENT_ID=?";
-        return dao.queryAllEmployees(sql,new Object[]{mangerId});
+        return dao.queryPersonsByManagerId(mangerId);
     }
 
     @Override
