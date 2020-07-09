@@ -56,9 +56,35 @@ public interface ITEmployeeDAO {
     public List<TEmployee> queryPersonsByManagerId(int mangerId);
 
     @Select("select count(*) from T_EMPLOYEE where PARENT_ID=#{managerId} and WORKSTATE=1")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE, timeout = 10000,useCache=true)
+    @ResultMap(value = "empMapper")
     public int queryPersonsByManagerIdTotalRecords(int managerId);
 
-    public List<TEmployee> queryAllEmployees(String sql,Object [] params);
+    @Select("select * from (select ROWNUM rm,t.* from T_EMPLOYEE t where PARENT_ID=#{mangerId} and WORKSTATE=1 ) temp where temp.rm between #{start} and #{end}")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE, timeout = 10000,useCache=true)
+    @ResultMap(value = "empMapper")
+    public List<TEmployee> queryPersonsByManagerIdByPaging(int mangerId, int start, int end);
+
+    @Select("select * from (select rownum rm,te.* from T_EMPLOYEE te where ROLE_ID!=1 and WORKSTATE=1 order by te.EMPLOYEE_ID desc)temp where temp.rm between #{start} and #{end}")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE, timeout = 10000,useCache=true)
+    @ResultMap(value = "empMapper")
+    public List<TEmployee> getAllEmployessByPaging(int start, int end);
+
+    @Select("select count(*) from T_EMPLOYEE  where ROLE_ID!=1 and WORKSTATE=1")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE, timeout = 10000,useCache=true)
+    @ResultMap(value = "empMapper")
+    public int queryTotalEmployeeRecords();
+
+    @Select("select * from (select rownum rm,te.* from T_EMPLOYEE te where ROLE_ID=3 and WORKSTATE=1 order by te.EMPLOYEE_ID desc)temp where temp.rm between #{start} and #{end}")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE, timeout = 10000,useCache=true)
+    @ResultMap(value = "empMapper")
+    public List<TEmployee> getAllPersonByPaging(int start, int end);
+
+    @Select("select count(*) from T_EMPLOYEE  where ROLE_ID=3 and WORKSTATE=1")
+    @Options(flushCache = Options.FlushCachePolicy.FALSE, timeout = 10000,useCache=true)
+    @ResultMap(value = "empMapper")
+    public int queryTotalPersonRecords();
+
 
     @Insert("insert into T_EMPLOYEE values(0,#{employee_Name},#{password},#{reaL_Name},#{sex},#{birthday},#{duty},#{enrolldate},#{education},#{major},#{experience},#{role.role_Id},#{parent.employee_Id},1)")
     public int insertEmployee(TEmployee employee);
@@ -66,7 +92,6 @@ public interface ITEmployeeDAO {
     @Update("update T_EMPLOYEE set WORKSTATE=0 where EMPLOYEE_ID=#{employee_Id}")
     public int deleteEmployee(@Param("employee_Id") int id);
 
-;
 
     /**
      * 修改员工上级
@@ -74,9 +99,8 @@ public interface ITEmployeeDAO {
      * @param parent_id 修改的上级编号
      * @return 受影响行数
      */
-    @Update("update T_EMPLOYEE set parent_id=#{parent.employee_Id} where employee_Id=#{employee_Id}")
+    @Update("update T_EMPLOYEE set parent_id=#{empId} where employee_Id=#{parent_id}")
     public int updateEmployeeParent(int empId, Integer parent_id);
 
-    public int queryForInt(String sql,Object [] params);
 
 }

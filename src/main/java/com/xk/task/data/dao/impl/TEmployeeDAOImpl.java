@@ -21,23 +21,24 @@ import java.util.List;
 @Repository("empDao")
 public class TEmployeeDAOImpl extends SqlSessionDaoSupport implements ITEmployeeDAO {
 
-    private JdbcTemplate template=new JdbcTemplate(DBUtil.getDataSource());
+    private JdbcTemplate template = new JdbcTemplate(DBUtil.getDataSource());
     @Resource(name = "sqlSessionFactory")
     SqlSessionFactory sqlSessionFactory;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         setSqlSessionFactory(sqlSessionFactory);
     }
+
     //映射实体类
-    RowMapper rowMapper=new RowMapper() {
+    RowMapper rowMapper = new RowMapper() {
         @Override
         public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return new TEmployee(rs.getInt("employee_Id"),rs.getString("employee_Name"),
-                    rs.getString("password"),rs.getString("reaL_Name"),rs.getString("sex"),
-                    rs.getTimestamp("birthday"),rs.getString("duty"),rs.getTimestamp("enrolldate"),
-                    rs.getString("education"),rs.getString("major"),rs.getString("experience"),
-                    new TRole(rs.getInt("ROLE_ID")),new TEmployee(rs.getInt("PARENT_ID")));
+            return new TEmployee(rs.getInt("employee_Id"), rs.getString("employee_Name"),
+                    rs.getString("password"), rs.getString("reaL_Name"), rs.getString("sex"),
+                    rs.getTimestamp("birthday"), rs.getString("duty"), rs.getTimestamp("enrolldate"),
+                    rs.getString("education"), rs.getString("major"), rs.getString("experience"),
+                    new TRole(rs.getInt("ROLE_ID")), new TEmployee(rs.getInt("PARENT_ID")));
         }
     };
 
@@ -45,13 +46,13 @@ public class TEmployeeDAOImpl extends SqlSessionDaoSupport implements ITEmployee
     @Override
     public TEmployee login(TEmployee employee) {
         //and status=1  //用户在职状态
-        TEmployee tEmployee=null;
+        TEmployee tEmployee = null;
         try {
-            SqlSession session=sqlSessionFactory.openSession();
-            ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
-            tEmployee=dao.login(employee);
+            SqlSession session = sqlSessionFactory.openSession();
+            ITEmployeeDAO dao = session.getMapper(ITEmployeeDAO.class);
+            tEmployee = dao.login(employee);
             session.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             System.out.println("未查询到员工");
             return null;
@@ -61,13 +62,13 @@ public class TEmployeeDAOImpl extends SqlSessionDaoSupport implements ITEmployee
 
     @Override
     public List<TEmployee> getAllEmployess() {
-        List allEmployee=null;
+        List allEmployee = null;
         try {
-            SqlSession session=sqlSessionFactory.openSession();
-            ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
-            allEmployee=dao.getAllEmployess();
+            SqlSession session = sqlSessionFactory.openSession();
+            ITEmployeeDAO dao = session.getMapper(ITEmployeeDAO.class);
+            allEmployee = dao.getAllEmployess();
             session.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return allEmployee;
@@ -75,13 +76,13 @@ public class TEmployeeDAOImpl extends SqlSessionDaoSupport implements ITEmployee
 
     @Override
     public List<TEmployee> getDents(int id) {
-        List allEmployee=null;
+        List allEmployee = null;
         try {
-            SqlSession session=sqlSessionFactory.openSession();
-            ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
-            allEmployee=dao.getDents(id);
+            SqlSession session = sqlSessionFactory.openSession();
+            ITEmployeeDAO dao = session.getMapper(ITEmployeeDAO.class);
+            allEmployee = dao.getDents(id);
             session.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return allEmployee;
@@ -89,13 +90,13 @@ public class TEmployeeDAOImpl extends SqlSessionDaoSupport implements ITEmployee
 
     @Override
     public List<TEmployee> queryEmployeeById(int id) {
-        List<TEmployee> employee=null;
+        List<TEmployee> employee = null;
         try {
-            SqlSession session=sqlSessionFactory.openSession();
-            ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
-            employee=dao.queryEmployeeById(id);
+            SqlSession session = sqlSessionFactory.openSession();
+            ITEmployeeDAO dao = session.getMapper(ITEmployeeDAO.class);
+            employee = dao.queryEmployeeById(id);
             session.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return employee;
@@ -103,13 +104,13 @@ public class TEmployeeDAOImpl extends SqlSessionDaoSupport implements ITEmployee
 
     @Override
     public List<TEmployee> queryPersonsByManagerId(int mangerId) {
-        List allEmployee=null;
+        List allEmployee = null;
         try {
-            SqlSession session=sqlSessionFactory.openSession();
-            ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
-            allEmployee=dao.queryPersonsByManagerId(mangerId);
+            SqlSession session = sqlSessionFactory.openSession();
+            ITEmployeeDAO dao = session.getMapper(ITEmployeeDAO.class);
+            allEmployee = dao.queryPersonsByManagerId(mangerId);
             session.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return allEmployee;
@@ -118,65 +119,125 @@ public class TEmployeeDAOImpl extends SqlSessionDaoSupport implements ITEmployee
     @Override
     public int queryPersonsByManagerIdTotalRecords(int managerId) {
         System.out.println("执行添加的DAO");
-        SqlSession session=super.getSqlSession();
-       ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
-        int num=dao.queryPersonsByManagerIdTotalRecords(managerId);
+        SqlSession session = super.getSqlSession();
+        ITEmployeeDAO dao = session.getMapper(ITEmployeeDAO.class);
+        int num = dao.queryPersonsByManagerIdTotalRecords(managerId);
         session.close();
         return num;
     }
 
     @Override
-    public List<TEmployee> queryAllEmployees(String sql,Object [] params) {
-        return template.query(sql,params,rowMapper);
+    public List<TEmployee> queryPersonsByManagerIdByPaging(int mangerId, int start, int end) {
+        List<TEmployee> allEmp = null;
+        try {
+            SqlSession session = sqlSessionFactory.openSession();
+            ITEmployeeDAO dao = session.getMapper(ITEmployeeDAO.class);
+            allEmp = dao.queryPersonsByManagerIdByPaging(mangerId, start, end);
+            session.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return allEmp;
     }
+
+    @Override
+    public List<TEmployee> getAllEmployessByPaging(int start, int end) {
+        List<TEmployee> allEmp = null;
+        try {
+            SqlSession session = sqlSessionFactory.openSession();
+            ITEmployeeDAO dao = session.getMapper(ITEmployeeDAO.class);
+            allEmp = dao.getAllEmployessByPaging(start, end);
+            session.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return allEmp;
+    }
+
+    @Override
+    public int queryTotalEmployeeRecords() {
+        int count = 0;
+        try {
+            SqlSession session = sqlSessionFactory.openSession();
+            ITEmployeeDAO dao = session.getMapper(ITEmployeeDAO.class);
+            count = dao.queryTotalEmployeeRecords();
+            session.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    @Override
+    public List<TEmployee> getAllPersonByPaging(int start, int end) {
+        List<TEmployee> allPerson = null;
+        try {
+            SqlSession session = sqlSessionFactory.openSession();
+            ITEmployeeDAO dao = session.getMapper(ITEmployeeDAO.class);
+            allPerson = dao.getAllPersonByPaging(start, end);
+            session.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return allPerson;
+    }
+
+    @Override
+    public int queryTotalPersonRecords() {
+        int count = 0;
+        try {
+            SqlSession session = sqlSessionFactory.openSession();
+            ITEmployeeDAO dao = session.getMapper(ITEmployeeDAO.class);
+            count = dao.queryTotalPersonRecords();
+            session.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
 
     @Override
     public int insertEmployee(TEmployee emp) {
         System.out.println("执行添加的DAO");
-    SqlSession session=super.getSqlSession();
-    int num=session.insert("com.xk.task.data.dao.ITEmployeeDAO.insertEmployee",emp);
-        System.out.println("返回添加记录的总数："+num);
-        System.out.println("主键："+emp.getEmployee_Id());
-    int key=emp.getEmployee_Id();
+        SqlSession session = super.getSqlSession();
+        int num = session.insert("com.xk.task.data.dao.ITEmployeeDAO.insertEmployee", emp);
+        System.out.println("返回添加记录的总数：" + num);
+        System.out.println("主键：" + emp.getEmployee_Id());
+        int key = emp.getEmployee_Id();
         return key;
-}
+    }
 
     @Override
     public int deleteEmployee(int id) {
 
 //        String sql3="delete T_EMPLOYEE where employee_Id =?";
         //修改员工的状态为离职状态
-        int count=0;
+        int count = 0;
         try {
-            SqlSession session=sqlSessionFactory.openSession();
-            ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
-            count=dao.deleteEmployee(id);
-            System.out.println("返回删除的条数"+count);
-        }catch (Exception e){
+            SqlSession session = sqlSessionFactory.openSession();
+            ITEmployeeDAO dao = session.getMapper(ITEmployeeDAO.class);
+            count = dao.deleteEmployee(id);
+            System.out.println("返回删除的条数" + count);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return count;
     }
-
 
 
     @Override
     public int updateEmployeeParent(int empId, Integer parent_id) {
-        int count=0;
+        int count = 0;
         try {
-            SqlSession session=sqlSessionFactory.openSession();
-            ITEmployeeDAO dao=session.getMapper(ITEmployeeDAO.class);
-            count=dao.updateEmployeeParent(empId,parent_id);
-            System.out.println("返回删除的条数"+count);
-        }catch (Exception e){
+            SqlSession session = sqlSessionFactory.openSession();
+            ITEmployeeDAO dao = session.getMapper(ITEmployeeDAO.class);
+            count = dao.updateEmployeeParent(empId, parent_id);
+            System.out.println("返回删除的条数" + count);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return count;
-    }
-
-    @Override
-    public int queryForInt(String sql, Object[] params) {
-        return template.queryForInt(sql,params);
     }
 
 }

@@ -109,17 +109,13 @@ public class TPlanDAOImpl extends SqlSessionDaoSupport implements ITPlanDAO {
     }
 
     @Override
-    public List<TPlan> advanceQueryPlan(PlanDTO dto) {
-        return null;
+    public List<TPlan> queryPlanList(String sql, Object[] params) {
+        return template.query(sql,params,rowMapper);
     }
 
     @Override
-    public List<TPlan> advanceQueryPlanByPaging(PlanDTO dto, int start, int end) {
-        return null;
+    public int queryPlanForInt(String sql, Object[] params) {
+        return template.queryForInt(sql,params);
     }
 
-    @Override
-    public int advanceQueryPlanTotalCount(PlanDTO dto) {
-        return 0;
-    }
 }

@@ -61,39 +61,31 @@ public class TEmployeeServiecImpl  implements ITEmployeeService {
 
     @Override
     public List<TEmployee> queryPersonsByManagerIdByPaging(int mangerId, int start, int end) {
-        String sql="select * from (select ROWNUM rm,t.* from T_EMPLOYEE t where PARENT_ID=? and WORKSTATE=1 ) temp where temp.rm between ? and ?";
-        return dao.queryAllEmployees(sql,new Object[]{mangerId,start,end});
+        return dao.queryPersonsByManagerIdByPaging(mangerId,start,end);
     }
 
     @Override
     public int queryPersonsByManagerIdTotalRecords(int managerId) {
-        String sql="select count(*) from T_EMPLOYEE where PARENT_ID=? and WORKSTATE=1";
-        return dao.queryForInt(sql,new Object[]{managerId});
+        return dao.queryPersonsByManagerIdTotalRecords(managerId);
     }
 
     @Override
     public List<TEmployee> getAllEmployessByPaging(int start, int end) {
-        String sql="select * from (select rownum rm,te.* from T_EMPLOYEE te where ROLE_ID!=1 and WORKSTATE=1 order by te.EMPLOYEE_ID desc)temp where temp.rm between ? and ?";
-        return dao.queryAllEmployees(sql,new Object[]{start,end});
+        return dao.getAllEmployessByPaging(start,end);
     }
 
     @Override
     public int queryTotalEmployeeRecords() {
-        String sql="select count(*) from T_EMPLOYEE  where ROLE_ID!=1 and WORKSTATE=1";
-        return dao.queryForInt(sql,null);
+        return dao.queryTotalEmployeeRecords();
     }
 
     @Override
     public List<TEmployee> getAllPersonByPaging(int start, int end) {
-        String sql="select * from (select rownum rm,te.* from T_EMPLOYEE te where ROLE_ID=3 and WORKSTATE=1 order by te.EMPLOYEE_ID desc)temp where temp.rm between ? and ?";
-        return dao.queryAllEmployees(sql,new Object[]{start,end});
+        return dao.getAllPersonByPaging(start,end);
     }
 
     @Override
     public int queryTotalPersonRecords() {
-        String sql="select count(*) from T_EMPLOYEE  where ROLE_ID=3 and WORKSTATE=1";
-        return dao.queryForInt(sql,null);
+        return dao.queryTotalPersonRecords();
     }
-
-
 }
