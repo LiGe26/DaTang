@@ -97,7 +97,7 @@ public interface ITEmployeeDAO {
      * @param parent_id 修改的上级编号
      * @return 受影响行数
      */
-    @Update("update T_EMPLOYEE set parent_id=#{empId} where employee_Id=#{parent_id}")
+    @Update("update T_EMPLOYEE set parent_id=#{parent_id} where employee_Id=#{empId}")
     public int updateEmployeeParent(@Param("empId") int empId,@Param("parent_id") Integer parent_id);
 
 
