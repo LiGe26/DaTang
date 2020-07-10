@@ -1,6 +1,7 @@
 package com.xk.task.data.dao.impl;
 
 import com.xk.task.data.dao.ITEmployeeDAO;
+import com.xk.task.data.dao.ITTaskDAO;
 import com.xk.task.data.pojo.TEmployee;
 import com.xk.task.data.pojo.TRole;
 import com.xk.task.data.util.DBUtil;
@@ -122,7 +123,6 @@ public class TEmployeeDAOImpl extends SqlSessionDaoSupport implements ITEmployee
         SqlSession session = super.getSqlSession();
         ITEmployeeDAO dao = session.getMapper(ITEmployeeDAO.class);
         int num = dao.queryPersonsByManagerIdTotalRecords(managerId);
-        session.close();
         return num;
     }
 
@@ -199,13 +199,11 @@ public class TEmployeeDAOImpl extends SqlSessionDaoSupport implements ITEmployee
 
     @Override
     public int insertEmployee(TEmployee emp) {
-        System.out.println("执行添加的DAO");
-        SqlSession session = super.getSqlSession();
-        int num = session.insert("com.xk.task.data.dao.ITEmployeeDAO.insertEmployee", emp);
-        System.out.println("返回添加记录的总数：" + num);
-        System.out.println("主键：" + emp.getEmployee_Id());
-        int key = emp.getEmployee_Id();
-        return key;
+        SqlSession sqlSession= sqlSessionFactory.openSession();
+        ITEmployeeDAO dao= sqlSession.getMapper(ITEmployeeDAO.class);
+        int  count=dao.insertEmployee(emp);
+        sqlSession.close();
+        return count;
     }
 
     @Override
