@@ -100,7 +100,7 @@ public class TPlan {
     }
 
     public void setIs_Feedback(String is_Feedback) {
-        if(is_Feedback.equals("no")){
+        if(is_Feedback.equals("no")||is_Feedback.equals("否")){
             this.is_Feedback = "否";
         }else{
             this.is_Feedback = "是";

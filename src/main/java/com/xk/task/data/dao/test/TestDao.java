@@ -65,5 +65,7 @@ public class TestDao {
 //        int count=dao.deleteEmployee(22);
 //        System.out.println("查询到的数据："+count);
 //        System.out.println(dao.login(employee));
+
+        System.out.println(  dao.queryPlanByTaskId(95));
     }
 }
