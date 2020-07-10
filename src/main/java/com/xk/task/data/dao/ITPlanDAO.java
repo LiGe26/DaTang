@@ -19,7 +19,7 @@ public interface ITPlanDAO {
             @Result(id = true, property="plan_Id", column="PLAN_ID",javaType = int.class),
             @Result(property="plan_Name",column="PLAN_NAME",javaType = String.class),
             @Result(property="status", column="STATUS",javaType = String.class),
-            @Result(property="is_Feedback", column="is_Feedback1",javaType = String.class),
+            @Result(property="is_Feedback", column="is_Feedback",javaType = String.class),
             @Result(property="begin_Date", column="BEGIN_DATE",javaType = Date.class),
             @Result(property="end_Date", column="END_DATE",javaType = Date.class),
             @Result(property="task_Id", column="TASK_ID",javaType = int.class),
