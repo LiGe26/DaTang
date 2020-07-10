@@ -1,11 +1,13 @@
 package com.xk.task.service.test;
 
 
+import com.xk.task.data.dao.ITPlanDAO;
 import com.xk.task.data.dao.ITRoleDAO;
 import com.xk.task.data.dao.ITTaskDAO;
 import com.xk.task.service.ITEmployeeService;
 import com.xk.task.service.ITPlanService;
 import com.xk.task.service.ITTaskService;
+import com.xk.task.web.util.PlanDTO;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.Test;
@@ -43,6 +45,7 @@ public class TestService {
         System.out.println(service.login("zhangsan","123456"));
         System.out.println(dao.queryAllRoles());
 
+
         System.out.println("根据编号查询角色"+ dao.queryRoleById(2));
         System.out.println("查询所有角色:"+dao.queryAllRoles());
 
@@ -65,6 +68,19 @@ public class TestService {
 
 
 
+
+
+//        System.out.println("根据编号查询角色"+ dao.queryRoleById(2));
+//        System.out.println("查询所有角色:"+dao.queryAllRoles());
+//
+//        System.out.println(taskService.queryTaskListAndAssigner(6));
+//        System.out.println(taskService.queryTaskListAndAssignerByPaging(6,1,5));
+//        System.out.println("6号员工任务总数"+taskService.queryTaskListAndAssignerTotalCount(6));
+//        System.out.println("修改任务状态为实施受影响行数："+taskService.updateTaskStatusBegin(61));
+        PlanDTO dto=new PlanDTO();
+
+        dto.setSearch_Plan_Name("1");
+        System.out.println(planService.advanceQueryPlanByPaging(dto,1,5));;
 
     }
 
