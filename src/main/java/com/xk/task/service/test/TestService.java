@@ -38,12 +38,37 @@ public class TestService {
     @Resource(name = "taskDao")
     ITTaskDAO dao1;
 
-//    @Autowired
+    //    @Autowired
 //    SqlSessionTemplate sqlSession;
     @Test
     public void test() throws Exception {
-//        System.out.println(service.login("zhangsan","123456"));
-//        System.out.println(dao.queryAllRoles());
+        System.out.println(service.login("zhangsan","123456"));
+        System.out.println(dao.queryAllRoles());
+
+
+        System.out.println("根据编号查询角色"+ dao.queryRoleById(2));
+        System.out.println("查询所有角色:"+dao.queryAllRoles());
+
+        System.out.println(taskService.queryTaskListAndAssigner(6));
+        System.out.println(taskService.queryTaskListAndAssignerByPaging(6,1,5));
+        System.out.println("6号员工任务总数"+taskService.queryTaskListAndAssignerTotalCount(6));
+        System.out.println("修改任务状态为实施受影响行数："+taskService.updateTaskStatusBegin(61));
+        System.out.println("6员工全部任务"+taskService.queryTaskListAndImplementor(2));
+        System.out.println("分页："+taskService.queryTaskListAndImplementorByPaging(2,1,5));
+        System.out.println("未实施："+taskService.queryTaskUnDoneByManagerIdByPaging(2,1,5));
+        System.out.println("实施中："+taskService.queryTaskDoneByManagerIdByPaging(2,1,5));
+        System.out.println("待实施的记录数"+taskService.queryTaskUnDoneByManagerTotalRecords(2));
+        System.out.println("实施中的记录数"+taskService.queryTaskDoneByManagerTotalRecords(2));
+        System.out.println("查詢任務2："+taskService.queryTaskAndImplementorByTaskId(2));
+
+        System.out.println(taskService.queryTaskListAndImplementorTotalCount(2));
+        System.out.println(taskService.deleteTaskByIds(new Integer[]{102,101}));
+
+        System.out.println("完成任务影响行："+taskService.finishTask(47));
+
+
+
+
 
 //        System.out.println("根据编号查询角色"+ dao.queryRoleById(2));
 //        System.out.println("查询所有角色:"+dao.queryAllRoles());
@@ -56,6 +81,7 @@ public class TestService {
 
         dto.setSearch_Plan_Name("1");
         System.out.println(planService.advanceQueryPlanByPaging(dto,1,5));;
+
     }
 
 
